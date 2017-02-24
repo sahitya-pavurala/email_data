@@ -22,7 +22,7 @@ public class AnalysisDriver {
 
         List<String> inputFiles = null;
         try {
-            FilePreprocessor.process("/Users/sahityapavurala/Desktop/slack interview/email_data/EmailAnalysis/src/main/resources/test_input");
+            FilePreprocessor.process("");
         } catch (IOException e) {
             e.printStackTrace();
         }
