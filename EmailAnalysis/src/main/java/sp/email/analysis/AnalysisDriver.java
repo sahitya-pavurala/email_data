@@ -20,9 +20,9 @@ public class AnalysisDriver {
 
     public static void main(String[] args){
 
-        List<String> inputFiles = null;
+
         try {
-            FilePreprocessor.process("");
+            FilePreprocessor.process(args[0]);
         } catch (IOException e) {
             e.printStackTrace();
         }
