@@ -122,15 +122,17 @@ public class FilePreprocessor {
 
 
             public boolean accept(Path path) {
-                return !path.toString().endsWith(".txt");
+                return path.toString().endsWith(".txt");
             }
         }
 
         FileStatus[] dirStatus = fs.listStatus(dirname);
         for (FileStatus st: dirStatus){
+            LOGGER.info("Reading file paths in ::" + st.getPath());
             if(st.isDirectory()){
                 FileStatus[] fstatuses = fs.listStatus(st.getPath(),new CustomFileFilter());
                 for(FileStatus fstatus: fstatuses){
+                    LOGGER.info("adding file path :: "+ fstatus.getPath());
                     filePaths.add(fstatus.getPath());}
             }
 
