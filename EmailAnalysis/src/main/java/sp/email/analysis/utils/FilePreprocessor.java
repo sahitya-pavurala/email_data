@@ -32,6 +32,7 @@ public class FilePreprocessor {
         List<Path> filePaths = readFilePaths(new Path(dirName));
         try{
             Path homeDir = fs.getHomeDirectory();
+            LOGGER.info("The user home directory is ::"+homeDir.toString());
             Path emalPath = new Path(homeDir,"/test/email/email.txt");
             LOGGER.info("Email file path :: "+ emalPath);
             if (fs.exists(emalPath))
