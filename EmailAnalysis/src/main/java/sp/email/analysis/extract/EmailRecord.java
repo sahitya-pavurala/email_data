@@ -10,7 +10,7 @@ public class EmailRecord {
     private String message_id;
     private String sender;
     private String subject;
-    private String email_date;
+    private long email_date;
     private String label;
     private String hash;
 
@@ -51,11 +51,11 @@ public class EmailRecord {
         this.sender = sender;
     }
 
-    public String getEmail_date() {
+    public long getEmail_date() {
         return email_date;
     }
 
-    public void setEmail_date(String email_date) {
+    public void setEmail_date(long email_date) {
         this.email_date = email_date;
     }
 

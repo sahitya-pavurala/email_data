@@ -5,7 +5,7 @@ create external table if not exists email
     message_id string,
     sender string,
     subject string,
-    email_date string,
+    email_date bigint,
     label string,
     sub_md5 string
 
