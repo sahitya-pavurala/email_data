@@ -57,7 +57,7 @@ public class FilePreprocessor {
                     LOGGER.info("The line values is ::" + s);
                     String[] vals = s.split(": ");
                     String val =null;
-                    if(vals.length > 0)
+                    if(vals.length > 1)
                         val = s.split(": ")[1];
 
                     if (s.startsWith("Message-ID"))
