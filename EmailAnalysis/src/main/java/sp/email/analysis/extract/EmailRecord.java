@@ -74,7 +74,7 @@ public class EmailRecord {
                 .append(subject).append(Constants.DELIMITER).append(email_date).append(Constants.DELIMITER)
                 .append(label).append(Constants.DELIMITER).append(hash);
 
-        return sb.toString();
+        return sb.append("\n").toString();
     }
 
 

@@ -69,7 +69,7 @@ public class RecipientRecord {
                 .append(recipient).append(Constants.DELIMITER).append(is_to).append(Constants.DELIMITER)
                 .append(is_cc).append(Constants.DELIMITER).append(is_bcc);
 
-        return sb.toString();
+        return sb.append("\n").toString();
     }
 
 
