@@ -33,12 +33,12 @@ public class FilePreprocessor {
         try{
             Path homeDir = fs.getHomeDirectory();
             LOGGER.info("The user home directory is ::"+homeDir.toString());
-            Path emalPath = new Path(homeDir,"/test/email/email.txt");
+            Path emalPath = new Path(homeDir,"test/email/email.txt");
             LOGGER.info("Email file path :: "+ emalPath);
             if (fs.exists(emalPath))
                 fs.delete(emalPath);
 
-            Path recipientPath = new Path(homeDir,"/test/recipient/recipient.txt");
+            Path recipientPath = new Path(homeDir,"test/recipient/recipient.txt");
             LOGGER.info("Recipient file path ::"+ recipientPath);
             if(fs.exists(recipientPath))
                 fs.delete(recipientPath);
