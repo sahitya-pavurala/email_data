@@ -100,6 +100,7 @@ public class FilePreprocessor {
             }
 
         } catch (Exception e) {
+            LOGGER.info("Exception in FileProcess "+ e.toString());
             e.printStackTrace();
         }
 
