@@ -40,8 +40,8 @@ public class FilePreprocessor {
             if(fs.exists(recipientPath))
                 fs.delete(recipientPath);
 
-            FSDataOutputStream emailoutputStream = fs.create(emalPath);
-            FSDataOutputStream recipientoutputStream = fs.create(recipientPath);
+            FSDataOutputStream emailoutputStream = fs.create(emalPath,true);
+            FSDataOutputStream recipientoutputStream = fs.create(recipientPath,true);
 
             for (Path file : filePaths) {
                 EmailRecord emailRecord = new EmailRecord();
