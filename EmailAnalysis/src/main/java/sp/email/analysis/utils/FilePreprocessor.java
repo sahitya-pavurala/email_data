@@ -30,8 +30,8 @@ public class FilePreprocessor {
         try {
             FileSystem fs = FileSystem.get(new Configuration());
             Path homeDir = fs.getHomeDirectory();
-            FSDataOutputStream emailoutputStream = fs.create(new Path(homeDir.toString() + "email"));
-            FSDataOutputStream recipientoutputStream = fs.create(new Path(homeDir.toString() + "recipient"));
+            FSDataOutputStream emailoutputStream = fs.create(new Path(homeDir.toString() + "/email"));
+            FSDataOutputStream recipientoutputStream = fs.create(new Path(homeDir.toString() + "/recipient"));
 
             for (File file : files) {
 
