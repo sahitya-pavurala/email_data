@@ -28,7 +28,7 @@ public class AnalysisDriver {
         }
 
 
-        SparkConf conf = new SparkConf();
+        SparkConf conf = new SparkConf().setAppName("OrchtransJob");
         SparkContext sc = new SparkContext(conf);
         HiveContext hqlc = new HiveContext(sc);
 
