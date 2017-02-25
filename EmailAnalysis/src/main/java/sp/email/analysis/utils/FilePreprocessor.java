@@ -98,6 +98,11 @@ public class FilePreprocessor {
                 }
 
             }
+            emailoutputStream.flush();
+            recipientoutputStream.flush();
+            emailoutputStream.close();
+            recipientoutputStream.close();
+            LOGGER.info("Output Streams closed");
 
         } catch (Exception e) {
             LOGGER.info("Exception in FileProcess "+ e.toString());
