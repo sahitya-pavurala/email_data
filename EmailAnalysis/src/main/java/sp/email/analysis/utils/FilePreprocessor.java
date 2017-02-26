@@ -65,6 +65,7 @@ public class FilePreprocessor {
                     else if (s.startsWith("Date"))
                         emailRecord.setEmail_date(parseDate(val));
                     else if (s.startsWith("Subject")) {
+                        val = s.replace("Subject:","").trim();
                         emailRecord.setSubject(val);
                         emailRecord.setHash(EmailUtils.getHash(val));
                     }

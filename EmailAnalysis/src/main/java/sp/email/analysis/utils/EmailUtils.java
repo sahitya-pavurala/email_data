@@ -20,7 +20,7 @@ public class EmailUtils {
     public static String getHash(String value) {
         if(value == null)
             return null;
-        String newVal = value.replace("Re:", "").replaceAll("\\s+", "");
+        String newVal = value.toLowerCase().replace("re:", "").replaceAll("\\s+", "");
         String retVal = null;
         if (newVal.length() > 0) {
             try {
