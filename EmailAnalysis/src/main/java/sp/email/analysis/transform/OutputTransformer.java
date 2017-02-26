@@ -51,8 +51,8 @@ public class OutputTransformer {
             System.out.println("The top three senders of broadcast emails are ");
             printRows(second);
 
-            Row[] third = hqlc.sql("SELECT e.hash,e.message_id,e.subject,e.sender,r.recipient,e.email_date from email e,recipient r " +
-                    "where e.message_id = r.message_id and e.hash is NOT NULL " +
+            Row[] third = hqlc.sql("SELECT e.hash,e.message_id,e.subject,e.sender,r.recipient,e.email_date from email e left join recipient r " +
+                    "on e.message_id = r.message_id where e.hash is NOT NULL " +
                     "order by e.hash,e.email_date asc").collect();
 
             HashMap<String, Long> response = new HashMap<String, Long>();
