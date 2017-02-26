@@ -72,7 +72,7 @@ public class FilePreprocessor {
                     }
                     else if (s.startsWith("Subject")) {
                         previousLine = "Subject";
-                        val = s.replace("Subject:","").replace("Re:","").trim();
+                        val = s.trim().replace("Subject:","").replace("Re:","").replaceAll(" +", " ").replaceAll(","," ");
                         emailRecord.setSubject(val);
                         emailRecord.setHash(EmailUtils.getHash(val));
                     }
@@ -104,6 +104,8 @@ public class FilePreprocessor {
                         }
                         break;
                     }
+                    else if (s.startsWith("Mime-Version") || s.startsWith("Content-"))
+                        previousLine = "";
                     else{
                         if(previousLine == "To:") {
                             List<String> to_ids = getIds(s.trim());
@@ -120,7 +122,8 @@ public class FilePreprocessor {
                             recipientRecords.addAll(loadRecipients(bcc_ids,emailRecord,"bcc"));
                         }
                         if(previousLine=="Subject"){
-                            emailRecord.setSubject(emailRecord.getSubject()+s.trim());
+                            val = s.trim().replaceAll(" +", " ").replaceAll(","," ");
+                            emailRecord.setSubject(emailRecord.getSubject()+val);
                             emailRecord.setHash(EmailUtils.getHash(val));
                         }
 
