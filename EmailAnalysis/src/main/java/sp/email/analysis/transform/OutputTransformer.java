@@ -51,6 +51,7 @@ public class OutputTransformer {
             System.out.println("The top three senders of broadcast emails are ");
             printRows(second);
 
+
             Row[] third = hqlc.sql("SELECT e.hash,e.message_id,e.subject,e.sender,r.recipient,e.email_date from email e left join recipient r " +
                     "on e.message_id = r.message_id where e.hash is NOT NULL " +
                     "order by e.hash,e.email_date asc").collect();
@@ -73,7 +74,8 @@ public class OutputTransformer {
                     continue;
                 } else {
                     preHash = hash;
-                    String key = message_id + "," + subject + "," + sender + "," + recipient;
+                    String key = message_id;
+                            //+ "," + subject + "," + sender + "," + recipient;
                     response.put(key, email_date - pretimeStamp);
                     pretimeStamp = email_date;
                 }
