@@ -1,5 +1,9 @@
 package sp.email.analysis.extract;
 
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import sp.email.analysis.utils.Constants;
 
 /**
@@ -76,6 +80,20 @@ public class EmailRecord {
 
         return sb.append("\n").toString();
     }
+
+    public static StructType getSchema() {
+        StructType customSchema = new StructType(new StructField[]{
+                new StructField("message_id", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("sender", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("subject", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("email_date", DataTypes.LongType, true, Metadata.empty()),
+                new StructField("label", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("hash", DataTypes.StringType, true, Metadata.empty())
+        });
+
+        return customSchema;
+    }
+
 
 
 }

@@ -1,5 +1,9 @@
 package sp.email.analysis.extract;
 
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import sp.email.analysis.utils.Constants;
 
 /**
@@ -8,7 +12,6 @@ import sp.email.analysis.utils.Constants;
 public class RecipientRecord {
 
     private String message_id;
-    private String sender;
     private String recipient;
     private int is_to;
     private int is_cc;
@@ -20,14 +23,6 @@ public class RecipientRecord {
 
     public void setMessage_id(String message_id) {
         this.message_id = message_id;
-    }
-
-    public String getSender() {
-        return sender;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
     }
 
     public String getRecipient() {
@@ -65,11 +60,23 @@ public class RecipientRecord {
     public String toString(){
         StringBuilder sb = new StringBuilder();
 
-        sb.append(message_id).append(Constants.DELIMITER).append(sender).append(Constants.DELIMITER)
+        sb.append(message_id).append(Constants.DELIMITER)
                 .append(recipient).append(Constants.DELIMITER).append(is_to).append(Constants.DELIMITER)
                 .append(is_cc).append(Constants.DELIMITER).append(is_bcc);
 
         return sb.append("\n").toString();
+    }
+
+    public static StructType getSchema() {
+        StructType customSchema = new StructType(new StructField[]{
+                new StructField("message_id", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("recipient", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("is_to", DataTypes.IntegerType, true, Metadata.empty()),
+                new StructField("is_cc", DataTypes.IntegerType, true, Metadata.empty()),
+                new StructField("is_bcc", DataTypes.IntegerType, true, Metadata.empty())
+        });
+
+        return customSchema;
     }
 
 

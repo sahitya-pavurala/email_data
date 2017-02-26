@@ -1,19 +1,17 @@
 package sp.email.analysis.utils;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.apache.log4j.Logger;
 import sp.email.analysis.extract.EmailRecord;
 import sp.email.analysis.extract.RecipientRecord;
+import sp.email.analysis.transform.OutputTransformer;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import static sp.email.analysis.utils.EmailUtils.parseDate;
 
@@ -24,7 +22,7 @@ public class FilePreprocessor {
     public static Logger LOGGER = Logger.getLogger(FilePreprocessor.class);
 
 
-    public static void process(String dirName) throws IOException {
+    public static void process(String dirName, OutputTransformer outputTrans) throws IOException {
 
         Configuration conf = new Configuration();
         FileSystem fs = FileSystem.get(new Configuration());
@@ -33,12 +31,12 @@ public class FilePreprocessor {
         try{
             Path homeDir = fs.getHomeDirectory();
             LOGGER.info("The user home directory is ::"+homeDir.toString());
-            Path emalPath = new Path(homeDir,"test/email/email.txt");
+            Path emalPath = new Path(homeDir,"test/email/email.csv");
             LOGGER.info("Email file path :: "+ emalPath);
             if (fs.exists(emalPath))
                 fs.delete(emalPath);
 
-            Path recipientPath = new Path(homeDir,"test/recipient/recipient.txt");
+            Path recipientPath = new Path(homeDir,"test/recipient/recipient.csv");
             LOGGER.info("Recipient file path ::"+ recipientPath);
             if(fs.exists(recipientPath))
                 fs.delete(recipientPath);
@@ -49,7 +47,7 @@ public class FilePreprocessor {
             for (Path file : filePaths) {
                 EmailRecord emailRecord = new EmailRecord();
                 List<RecipientRecord> recipientRecords = new ArrayList<RecipientRecord>();
-
+                int recipient_count = 0;
                 BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(file)));
                 String s = br.readLine();
 
@@ -71,21 +69,22 @@ public class FilePreprocessor {
                         emailRecord.setHash(EmailUtils.getHash(val));
                     }
                     else if(s.startsWith("To")){
-                        List<String> ids = getIds(val);
-                        emailRecord.setLabel(getLabel(ids.size()));
-                        recipientRecords.addAll(loadRecipients(ids,emailRecord,"to"));
+                        List<String> to_ids = getIds(val);
+                        recipient_count += to_ids.size();
+                        recipientRecords.addAll(loadRecipients(to_ids,emailRecord,"to"));
                     }
                     else if(s.startsWith("Cc")){
-                        List<String> ids = getIds(val);
-                        emailRecord.setLabel(getLabel(ids.size()));
-                        recipientRecords.addAll(loadRecipients(ids,emailRecord,"cc"));
+                        List<String> cc_ids = getIds(val);
+                        recipient_count += cc_ids.size();
+                        recipientRecords.addAll(loadRecipients(cc_ids,emailRecord,"cc"));
                     }
                     else if(s.startsWith("Bcc")){
-                        List<String> ids = getIds(val);
-                        emailRecord.setLabel(getLabel(ids.size()));
-                        recipientRecords.addAll(loadRecipients(ids,emailRecord,"bcc"));
+                        List<String> bcc_ids = getIds(val);
+                        recipient_count +=  bcc_ids.size();
+                        recipientRecords.addAll(loadRecipients(bcc_ids,emailRecord,"bcc"));
                     }
                     else if (s.startsWith("X-")) {
+                        emailRecord.setLabel(getLabel(recipient_count));
                         LOGGER.info("The email record is ::" + emailRecord.toString());
                         emailoutputStream.writeBytes(emailRecord.toString());
                         for(RecipientRecord record: recipientRecords) {
@@ -104,6 +103,9 @@ public class FilePreprocessor {
             emailoutputStream.close();
             recipientoutputStream.close();
             LOGGER.info("Output Streams closed");
+
+            outputTrans.setSources(emalPath,recipientPath);
+            outputTrans.setSchema(EmailRecord.getSchema(),RecipientRecord.getSchema());
 
         } catch (Exception e) {
             LOGGER.info("Exception in FileProcess "+ e.toString());
@@ -167,7 +169,6 @@ public class FilePreprocessor {
         for (String id : ids){
             RecipientRecord recipientRecord = new RecipientRecord();
             recipientRecord.setMessage_id(emailRecord.getMessage_id());
-            recipientRecord.setSender(emailRecord.getSender());
             recipientRecord.setRecipient(id.trim());
             if(check.equals("to"))
                 recipientRecord.setIs_to(1);

@@ -5,6 +5,7 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.hive.HiveContext;
+import sp.email.analysis.transform.OutputTransformer;
 import sp.email.analysis.utils.FilePreprocessor;
 
 
@@ -34,9 +35,17 @@ public class AnalysisDriver {
             HiveContext hqlc = new HiveContext(sc);
             LOGGER.info("Loaded spark context and hive context");
 
+            OutputTransformer outputTrans = new OutputTransformer();
+
             LOGGER.info("Starting file pre-process");
-            FilePreprocessor.process(args[0]);
+            FilePreprocessor.process(args[0],outputTrans);
             LOGGER.info("Completed file pre-process, ready to transform");
+
+
+
+            LOGGER.info("Running transforms");
+            outputTrans.transform(hqlc,sc);
+            LOGGER.info("Transformation done");
         } catch (IOException e) {
             e.printStackTrace();
         }
