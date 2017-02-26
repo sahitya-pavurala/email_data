@@ -38,7 +38,7 @@ public class OutputTransformer {
 
 
 
-        Row[] first  = hqlc.sql("select recipient,count(e.message_id) as cnt from recipient r, email e where e.message_id = r.message_id  " +
+        Row[] first  = hqlc.sql("select recipient,count(e.message_id) as cnt from recipient inner join email e on e.message_id = r.message_id  " +
                 "and e.label = 'direct' " +
                 "group by recipient order by cnt desc").limit(3).collect();
         System.out.println("The top three recipients of direct emails are ");
