@@ -50,7 +50,7 @@ public class FilePreprocessor {
                 int recipient_count = 0;
                 BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(file)));
                 String s = br.readLine();
-
+                String previousLine = null;
                 while (s != null) {
                     LOGGER.info("The line values is ::" + s);
                     String[] vals = s.split(": ");
@@ -58,28 +58,38 @@ public class FilePreprocessor {
                     if(vals.length > 1)
                         val = s.split(": ")[1];
 
-                    if (s.startsWith("Message-ID"))
+                    if (s.startsWith("Message-ID")){
+                        previousLine = "Message-ID";
                         emailRecord.setMessage_id(val);
-                    else if (s.startsWith("From"))
+                    }
+                    else if (s.startsWith("From")) {
+                        previousLine = "From";
                         emailRecord.setSender(val);
-                    else if (s.startsWith("Date"))
+                    }
+                    else if (s.startsWith("Date")) {
+                        previousLine = "Date";
                         emailRecord.setEmail_date(parseDate(val));
+                    }
                     else if (s.startsWith("Subject")) {
-                        val = s.replace("Subject:","").trim();
+                        previousLine = "Subject";
+                        val = s.replace("Subject:","").replace("Re:","").trim();
                         emailRecord.setSubject(val);
                         emailRecord.setHash(EmailUtils.getHash(val));
                     }
                     else if(s.startsWith("To")){
+                        previousLine = "To";
                         List<String> to_ids = getIds(val);
                         recipient_count += to_ids.size();
                         recipientRecords.addAll(loadRecipients(to_ids,emailRecord,"to"));
                     }
                     else if(s.startsWith("Cc")){
+                        previousLine = "Cc";
                         List<String> cc_ids = getIds(val);
                         recipient_count += cc_ids.size();
                         recipientRecords.addAll(loadRecipients(cc_ids,emailRecord,"cc"));
                     }
                     else if(s.startsWith("Bcc")){
+                        previousLine = "Bcc";
                         List<String> bcc_ids = getIds(val);
                         recipient_count +=  bcc_ids.size();
                         recipientRecords.addAll(loadRecipients(bcc_ids,emailRecord,"bcc"));
@@ -93,6 +103,27 @@ public class FilePreprocessor {
                             LOGGER.info("The recipient record is ::"+ record.toString());
                         }
                         break;
+                    }
+                    else{
+                        if(previousLine == "To:") {
+                            List<String> to_ids = getIds(s.trim());
+                            recipient_count += to_ids.size();
+                            recipientRecords.addAll(loadRecipients(to_ids, emailRecord, "to"));
+                        }
+                        if(previousLine == "Cc") {
+                            List<String> cc_ids = getIds(val);
+                            recipient_count += cc_ids.size();
+                            recipientRecords.addAll(loadRecipients(cc_ids, emailRecord, "cc"));
+                        }if(previousLine == "Bcc") {
+                            List<String> bcc_ids = getIds(val);
+                            recipient_count +=  bcc_ids.size();
+                            recipientRecords.addAll(loadRecipients(bcc_ids,emailRecord,"bcc"));
+                        }
+                        if(previousLine=="Subject"){
+                            emailRecord.setSubject(emailRecord.getSubject()+s.trim());
+                            emailRecord.setHash(EmailUtils.getHash(val));
+                        }
+
                     }
 
                     s = br.readLine();
