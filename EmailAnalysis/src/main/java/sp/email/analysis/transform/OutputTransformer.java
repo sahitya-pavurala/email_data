@@ -52,9 +52,9 @@ public class OutputTransformer {
             printRows(second);
 
 
-            Row[] third = hqlc.sql("SELECT e.hash,e.message_id,e.subject,e.sender,r.recipient,e.email_date from email e left join recipient r " +
-                    "on e.message_id = r.message_id where e.hash is NOT NULL " +
-                    "order by e.hash,e.email_date asc").collect();
+            Row[] third = hqlc.sql("SELECT hash,sender,message_id,email_date from email " +
+                    "where hash is NOT NULL " +
+                    "order by hash,email_date asc").collect();
 
             HashMap<String, Long> response = new HashMap<String, Long>();
             String preHash = null;
@@ -62,11 +62,9 @@ public class OutputTransformer {
             System.out.println("The nums of rows for third is :: " + third.length);
             for (Row row : third) {
                 String hash = (String) row.get(0);
-                String message_id = (String) row.get(1);
-                String subject = (String) row.get(2);
-                String sender = (String) row.get(3);
-                String recipient = (String) row.get(4);
-                Long email_date = (Long) row.get(5);
+                String sender = (String) row.get(1);
+                String message_id = (String) row.get(2);
+                Long email_date = (Long) row.get(3);
 
                 if (hash != preHash) {
                     preHash = hash;
@@ -74,9 +72,8 @@ public class OutputTransformer {
                     continue;
                 } else {
                     preHash = hash;
-                    String key = message_id;
                             //+ "," + subject + "," + sender + "," + recipient;
-                    response.put(key, email_date - pretimeStamp);
+                    response.put(message_id, email_date - pretimeStamp);
                     pretimeStamp = email_date;
                 }
 
