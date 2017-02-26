@@ -58,7 +58,7 @@ public class OutputTransformer {
                     " from email t1" +
                     " inner join email t2 on t1.hash = t2.hash and t1.message_id != t2.message_id" +
                     " inner join recipient t3 on t2.sender = t3.recipient" +
-                    " group by t2.sender  order by response_time" +
+                    " order by response_time" +
                     " ) res").limit(5).collect();
 
             System.out.println("The nums of rows for third is :: " + third.length);
