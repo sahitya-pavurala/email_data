@@ -56,6 +56,7 @@ public class OutputTransformer {
         HashMap<String,Long> response = new HashMap<String,Long>();
         String preHash = null;
         Long pretimeStamp = null;
+        System.out.println("The nums of rows for third is :: "+ third.length);
         for(Row row : third){
             String hash = (String) row.get(0);
             String message_id = (String) row.get(1);
