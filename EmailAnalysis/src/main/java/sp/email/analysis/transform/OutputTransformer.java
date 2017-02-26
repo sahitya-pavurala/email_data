@@ -52,14 +52,53 @@ public class OutputTransformer {
             printRows(second);
 
 
-            Row[] third = hqlc.sql("SELECT hash,sender,message_id,email_date from email " +
-                    "where hash is NOT NULL " +
-                    "order by hash,email_date asc").collect();
+            Row[] third = hqlc.sql(" select res.sender,res.response_time" +
+                    " from(" +
+                    " select t2.message_id,t2.hash,t2.sender,t2.subject,t2.email_date-t1.email_date as response_time" +
+                    " from email t1" +
+                    " inner join email t2 on t1.hash = t2.hash and t1.message_id != t2.message_id" +
+                    " inner join recipient t3 on t2.sender = t3.recipient" +
+                    " group by t2.sender  order by response_time" +
+                    " ) res").limit(5).collect();
+
+            System.out.println("The nums of rows for third is :: " + third.length);
+
+            printRows(third);
+/**
+ * SELECT
+ start_log.name,
+ MAX(start_log.ts) AS start_time,
+ end_log.ts AS end_time,
+ TIMEDIFF(MAX(start_log.ts), end_log.ts)
+ FROM
+ log AS start_log
+ INNER JOIN
+ log AS end_log ON (
+ start_log.name = end_log.name
+ AND
+ end_log.ts > start_log.ts)
+ WHERE start_log.eventtype = 'start'
+ AND end_log.eventtype = 'stop'
+ GROUP BY start_log.name
+
+ select res.sender,res.response_time
+ from(
+ select t2.message_id,t2.hash,t2.sender,t2.subject,t2.email_date-t1.email_date as response_time
+ from email t1
+ inner join email t2 on t1.hash = t2.hash and t1.message_id != t2.message_id
+ inner join recipient t3 on t2.sender = t3.recipient
+ group by t2.sender  order by response_time
+ ) res
+
+
+ */
+
+
 
             HashMap<String, Long> response = new HashMap<String, Long>();
             String preHash = null;
             Long pretimeStamp = null;
-            System.out.println("The nums of rows for third is :: " + third.length);
+
             for (Row row : third) {
                 String hash = (String) row.get(0);
                 String sender = (String) row.get(1);
