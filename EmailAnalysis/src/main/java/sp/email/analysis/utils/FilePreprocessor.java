@@ -122,7 +122,7 @@ public class FilePreprocessor {
                             recipientRecords.addAll(loadRecipients(bcc_ids,emailRecord,"bcc"));
                         }
                         if(previousLine=="Subject"){
-                            val = s.trim().replaceAll(" +", " ").replaceAll(","," ");
+                            val = s.replaceAll(" +", " ").replaceAll(","," ");
                             emailRecord.setSubject(emailRecord.getSubject()+val);
                             emailRecord.setHash(EmailUtils.getHash(val));
                         }
