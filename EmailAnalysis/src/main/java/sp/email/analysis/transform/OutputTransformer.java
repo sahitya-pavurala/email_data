@@ -1,11 +1,13 @@
 package sp.email.analysis.transform;
 
 import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.hive.HiveContext;
 import org.apache.spark.sql.types.StructType;
+import sp.email.analysis.utils.FilePreprocessor;
 
 import java.util.*;
 
@@ -13,6 +15,7 @@ import java.util.*;
  * Created by sahityapavurala on 2/25/17.
  */
 public class OutputTransformer {
+    public static Logger LOGGER = Logger.getLogger(OutputTransformer.class);
 
     private String emailSource;
     private String recipientSource;
@@ -21,71 +24,74 @@ public class OutputTransformer {
 
 
     public void transform(HiveContext hqlc, SparkContext sc){
+        try {
+            DataFrame emailDF = hqlc.read()
+                    .format("com.databricks.spark.csv")
+                    .schema(emailSchema)
+                    .load(emailSource);
 
-        DataFrame emailDF = hqlc.read()
-                .format("com.databricks.spark.csv")
-                .schema(emailSchema)
-                .load(emailSource);
+            emailDF.registerTempTable("email");
 
-        emailDF.registerTempTable("email");
+            DataFrame recipientDF = hqlc.read()
+                    .format("com.databricks.spark.csv")
+                    .schema(recipientSchema)
+                    .load(recipientSource);
 
-        DataFrame recipientDF = hqlc.read()
-                .format("com.databricks.spark.csv")
-                .schema(recipientSchema)
-                .load(recipientSource);
-
-        recipientDF.registerTempTable("recipient");
+            recipientDF.registerTempTable("recipient");
 
 
+            Row[] first = hqlc.sql("select recipient,count(e.message_id) as cnt from recipient r inner join email e on e.message_id = r.message_id  " +
+                    "where e.label = 'direct' " +
+                    "group by recipient order by cnt desc").limit(3).collect();
+            System.out.println("The top three recipients of direct emails are ");
+            printRows(first);
 
-        Row[] first  = hqlc.sql("select recipient,count(e.message_id) as cnt from recipient r inner join email e on e.message_id = r.message_id  " +
-                "where e.label = 'direct' " +
-                "group by recipient order by cnt desc").limit(3).collect();
-        System.out.println("The top three recipients of direct emails are ");
-        printRows(first);
+            Row[] second = hqlc.sql("select sender,count(*) as cnt from email where label='broadcast' " +
+                    "group by sender order by cnt desc").limit(3).collect();
+            System.out.println("The top three senders of broadcast emails are ");
+            printRows(second);
 
-        Row[] second = hqlc.sql("select sender,count(*) as cnt from email where label='broadcast' " +
-                "group by sender order by cnt desc").limit(3).collect();
-        System.out.println("The top three senders of broadcast emails are ");
-        printRows(second);
+            Row[] third = hqlc.sql("SELECT e.hash,e.message_id,e.subject,e.sender,r.recipient,e.email_date from email e,recipient r " +
+                    "where e.message_id = r.message_id and e.hash is NOT NULL " +
+                    "order by e.hash,e.email_date asc").collect();
 
-        Row[] third = hqlc.sql("SELECT e.hash,e.message_id,e.subject,e.sender,r.recipient,e.email_date from email e,recipient r " +
-                "where e.message_id = r.message_id and e.hash is NOT NULL " +
-                "order by e.hash,e.email_date asc").collect();
+            HashMap<String, Long> response = new HashMap<String, Long>();
+            String preHash = null;
+            Long pretimeStamp = null;
+            System.out.println("The nums of rows for third is :: " + third.length);
+            for (Row row : third) {
+                String hash = (String) row.get(0);
+                String message_id = (String) row.get(1);
+                String subject = (String) row.get(2);
+                String sender = (String) row.get(3);
+                String recipient = (String) row.get(4);
+                Long email_date = (Long) row.get(5);
 
-        HashMap<String,Long> response = new HashMap<String,Long>();
-        String preHash = null;
-        Long pretimeStamp = null;
-        System.out.println("The nums of rows for third is :: "+ third.length);
-        for(Row row : third){
-            String hash = (String) row.get(0);
-            String message_id = (String) row.get(1);
-            String subject = (String) row.get(2);
-            String sender = (String) row.get(3);
-            String recipient = (String) row.get(4);
-            Long email_date = (Long) row.get(5);
+                if (hash != preHash) {
+                    preHash = hash;
+                    pretimeStamp = email_date;
+                    continue;
+                } else {
+                    preHash = hash;
+                    String key = message_id + "," + subject + "," + sender + "," + recipient;
+                    response.put(key, email_date - pretimeStamp);
+                    pretimeStamp = email_date;
+                }
 
-            if (hash != preHash) {
-                preHash = hash;
-                pretimeStamp = email_date;
-                continue;
             }
-            else {
-                preHash = hash;
-                String key = message_id+","+subject+","+sender+","+recipient;
-                response.put(key,email_date - pretimeStamp);
-                pretimeStamp = email_date;
-            }
 
+            System.out.println("The size of map is :: " + response.size());
+
+            Map<String, Long> sortedMap = sortByValue(response);
+
+            System.out.println("The size of sorted map is :: " + sortedMap.size());
+
+            printMap(sortedMap, 5);
         }
-
-        System.out.println("The size of map is :: "+response.size());
-
-        Map<String, Long> sortedMap = sortByValue(response);
-
-        System.out.println("The size of sorted map is :: "+sortedMap.size());
-
-        printMap(sortedMap,5);
+        catch (Exception e) {
+            LOGGER.info("Exception in transform :: " + e.toString());
+            e.printStackTrace();
+        }
 
     }
 
