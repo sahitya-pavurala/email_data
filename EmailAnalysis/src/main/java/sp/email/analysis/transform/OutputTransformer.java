@@ -78,13 +78,13 @@ public class OutputTransformer {
 
         }
 
+        System.out.println("The size of map is :: "+response.size());
+
         Map<String, Long> sortedMap = sortByValue(response);
 
+        System.out.println("The size of sorted map is :: "+sortedMap.size());
+
         printMap(sortedMap,5);
-
-
-
-
 
     }
 
@@ -124,12 +124,19 @@ public class OutputTransformer {
     public static <K, V> void printMap(Map<K, V> map,int num) {
         int count = 0;
         System.out.println("The Fastest response times are ::");
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            if (count < num) {
-                System.out.println("Key : " + entry.getKey() + " Value : " + entry.getValue());
-                count += 1;
-            } else
-                break;
+        try {
+            for (Map.Entry<K, V> entry : map.entrySet()) {
+                System.out.println("Printing inside sorted map");
+                if (count < num) {
+                    System.out.println("Key : " + entry.getKey() + " Value : " + entry.getValue());
+                    count += 1;
+                } else
+                    break;
+            }
+        }
+        catch (Exception e){
+            System.out.println("Exception in printing sorted map :: " + e.toString());
+            e.printStackTrace();
         }
 
     }
@@ -137,7 +144,7 @@ public class OutputTransformer {
     public static void printRows(Row[] rows){
 
         for(Row row: rows){
-            System.out.println(row.mkString());
+            System.out.println(row.mkString(" "));
         }
 
     }
