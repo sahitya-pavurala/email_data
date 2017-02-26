@@ -51,15 +51,37 @@ public class OutputTransformer {
             System.out.println("The top three senders of broadcast emails are ");
             printRows(second);
 
+            String query = "select reply.sender,t1.email_date - t2.email_date as response_time " +
+                    "from" +
+                    "(select h1.message_id as `message-id (original)`, " +
+                    "reply.`message-id (reply)` " +
+                    "from email h1 " +
+                    "left join recipient r1 " +
+                    "on h1.message_id = r1.message_id " +
+                    "inner join" +
+                    "(select h2.message_id as `message-id (reply)`, " +
+                    "     h2.sender as `sender (reply)`," +
+                    "     r2.recipient `recipient (reply)`, " +
+                    "     h2.subject as `subject (reply)`, " +
+                    "     h2.email_date as `email_date (reply)` " +
+                    "     from email h2" +
+                    "     left join recipient r2 " +
+                    "     on h2.message_id = r2.message_id " +
+                    "     order by h2.email_date desc " +
+                    "    ) reply " +
+                    "on reply.`recipient (reply)` = h1.sender " +
+                    "and reply.`subject (reply)` = h1.subject " +
+                    "and h1.subject is not null " +
+                    "group by h1.subject " +
+                    "having count(distinct h1.sender)>1 " +
+                    "order by h1.email_date desc) withreply " +
+                    "left join email t1 " +
+                    "on withreply.`message-id (original)` = t1.message_id " +
+                    "left join email t2 " +
+                    "on withreply.`message-id (reply)` = t2.message_id " +
+                    "where t1.sender <> t2.sender and t1.subject is not null order by response_time";
 
-            Row[] third = hqlc.sql(" select res.sender,res.response_time" +
-                    " from(" +
-                    " select t2.message_id,t2.sender,t2.subject,t2.email_date-t1.email_date as response_time" +
-                    " from email t1" +
-                    " inner join email t2 on t1.hash = t2.hash and t1.message_id != t2.message_id" +
-                    " left join recipient t3 on t2.sender = t3.recipient and t2.message_id = t3.message_id" +
-                    " where t1.hash is not null and t2.hash is not null order by response_time" +
-                    " ) res").limit(5).collect();
+            Row[] third = hqlc.sql(query).limit(5).collect();
 
             System.out.println("The nums of rows for third is :: " + third.length);
 
