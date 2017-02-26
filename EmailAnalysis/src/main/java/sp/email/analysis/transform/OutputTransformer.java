@@ -51,35 +51,17 @@ public class OutputTransformer {
             System.out.println("The top three senders of broadcast emails are ");
             printRows(second);
 
-            String query = "select reply.sender,t1.email_date - t2.email_date as response_time " +
-                    "from" +
-                    "(select h1.message_id as `message-id (original)`, " +
-                    "reply.`message-id (reply)` " +
-                    "from email h1 " +
-                    "left join recipient r1 " +
-                    "on h1.message_id = r1.message_id " +
-                    "inner join" +
-                    "(select h2.message_id as `message-id (reply)`, " +
-                    "     h2.sender as `sender (reply)`," +
-                    "     r2.recipient `recipient (reply)`, " +
-                    "     h2.subject as `subject (reply)`, " +
-                    "     h2.email_date as `email_date (reply)` " +
-                    "     from email h2" +
-                    "     left join recipient r2 " +
-                    "     on h2.message_id = r2.message_id " +
-                    "     order by h2.email_date desc " +
-                    "    ) reply " +
-                    "on reply.`recipient (reply)` = h1.sender " +
-                    "and reply.`subject (reply)` = h1.subject " +
-                    "and h1.subject is not null " +
-                    "group by h1.subject " +
-                    "having count(distinct h1.sender)>1 " +
-                    "order by h1.email_date desc) withreply " +
-                    "left join email t1 " +
-                    "on withreply.`message-id (original)` = t1.message_id " +
-                    "left join email t2 " +
-                    "on withreply.`message-id (reply)` = t2.message_id " +
-                    "where t1.sender <> t2.sender and t1.subject is not null order by response_time";
+            String query = "select reply.sender,t1.email_date - t2.email_date as response_time from (select " +
+                    "h1.message_id as id_orig, reply.id_reply from email h1 left join recipient r1 on " +
+                    "h1.message_id = r1.message_id inner join (select h2.message_id as id_reply, " +
+                    "h2.subject as sub_reply, r2.Recipient as recipient_reply, from email h2 left " +
+                    "join recipient r2 on h2.message_id = r2.message_id order by h2.email_date desc ) " +
+                    "reply on reply.recipient_reply = h1.sender and reply.sub_reply = h1.subject and " +
+                    "h1.subject is not null having count(distinct " +
+                    "h1.sender)>1 order by h1.email_date desc) withreply left join email t1 on " +
+                    "withreply.id_orig = t1.message_id left join email t2 on withreply.id_reply = " +
+                    "t2.message_id where t1.sender <> t2.sender and t1.subject is not null order by " +
+                    "response_time";
 
             Row[] third = hqlc.sql(query).limit(5).collect();
 
