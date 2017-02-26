@@ -54,10 +54,10 @@ public class OutputTransformer {
 
             Row[] third = hqlc.sql(" select res.sender,res.response_time" +
                     " from(" +
-                    " select t2.message_id,t2.hash,t2.sender,t2.subject,t1.email_date-t2.email_date as response_time" +
+                    " select t2.message_id,t2.hash,t2.sender,t2.subject,t2.email_date-t1.email_date as response_time" +
                     " from email t1" +
                     " inner join email t2 on t1.hash = t2.hash and t1.message_id != t2.message_id" +
-                    " left join recipient t3 on t2.sender = t3.recipient" +
+                    " left join recipient t3 on t2.sender = t3.recipient and t2.message_id = t3.message_id" +
                     " order by response_time" +
                     " ) res").limit(5).collect();
 
