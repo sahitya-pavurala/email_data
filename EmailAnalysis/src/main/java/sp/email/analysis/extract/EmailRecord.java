@@ -8,6 +8,7 @@ import sp.email.analysis.utils.Constants;
 
 /**
  * Created by sahityapavurala on 2/23/17.
+ * Bean class for EmailRecord
  */
 public class EmailRecord {
 
@@ -18,6 +19,7 @@ public class EmailRecord {
     private String label;
     private String hash;
 
+    //getters and setters
 
     public String getMessage_id() {
         return message_id;
@@ -27,8 +29,6 @@ public class EmailRecord {
         this.message_id = messageID;
     }
 
-
-
     public String getSubject() {
         return subject;
     }
@@ -37,7 +37,6 @@ public class EmailRecord {
         this.subject = subject;
     }
 
-
     public String getLabel() {
         return label;
     }
@@ -45,7 +44,6 @@ public class EmailRecord {
     public void setLabel(String label) {
         this.label = label;
     }
-
 
     public String getSender() {
         return sender;
@@ -71,6 +69,11 @@ public class EmailRecord {
         this.hash = sub_md5;
     }
 
+    /**
+     * Override toString method to return the email record as
+     * String seperated by a delimiter
+     * @return
+     */
     public String toString(){
         StringBuilder sb = new StringBuilder();
 
@@ -81,6 +84,11 @@ public class EmailRecord {
         return sb.append("\n").toString();
     }
 
+    /**
+     * Return the schema of the email record to construct
+     * dataframe of email records from csv
+     * @return
+     */
     public static StructType getSchema() {
         StructType customSchema = new StructType(new StructField[]{
                 new StructField("message_id", DataTypes.StringType, true, Metadata.empty()),

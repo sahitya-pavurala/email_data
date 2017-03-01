@@ -6,17 +6,27 @@ import org.joda.time.format.DateTimeFormatter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/**
+/** Email Utility class
  * Created by sahityapavurala on 2/24/17.
  */
 public class EmailUtils {
 
+    /**
+     * Method the parse the date in the emails
+     * @param date
+     * @return
+     */
     public static long parseDate(String date) {
 
         long dt = Constants.DATE_TIME_FORMATTER.parseMillis(date);
         return dt;
     }
 
+    /**
+     * Method to get the hash value of the email subject
+     * @param value
+     * @return
+     */
     public static String getHash(String value) {
         if(value == null)
             return null;

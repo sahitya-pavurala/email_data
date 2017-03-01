@@ -15,13 +15,18 @@ import java.util.List;
 
 import static sp.email.analysis.utils.EmailUtils.parseDate;
 
-/**
+/** class to process email text files and extract records
  * Created by sahityapavurala on 2/22/17.
  */
 public class FilePreprocessor {
     public static Logger LOGGER = Logger.getLogger(FilePreprocessor.class);
 
-
+    /**
+     * Method to prcoess the files
+     * @param dirName
+     * @param outputTrans
+     * @throws IOException
+     */
     public static void process(String dirName, OutputTransformer outputTrans) throws IOException {
 
         Configuration conf = new Configuration();
@@ -150,7 +155,12 @@ public class FilePreprocessor {
 
     }
 
-
+    /**
+     * Mehod to read file paths from the directory
+     * @param dirname
+     * @return
+     * @throws IOException
+     */
     public static List<Path> readFilePaths(Path dirname) throws IOException {
         Configuration conf = new Configuration();
         FileSystem fs = FileSystem.get(conf);
@@ -179,6 +189,11 @@ public class FilePreprocessor {
         return filePaths;
     }
 
+    /**
+     * Method to get the email label
+     * @param num
+     * @return
+     */
     public static String getLabel(int num){
         String label = "direct";
 
@@ -188,6 +203,11 @@ public class FilePreprocessor {
 
     }
 
+    /**
+     * Method to get ids from a email
+     * @param val
+     * @return
+     */
     public static List<String> getIds(String val ){
         List<String> ids = new ArrayList<String>();
         if(val != null)
@@ -199,6 +219,13 @@ public class FilePreprocessor {
             return ids;
     }
 
+    /**
+     * Method to load recipient records
+     * @param ids
+     * @param emailRecord
+     * @param check
+     * @return
+     */
     public static List<RecipientRecord> loadRecipients(List<String> ids,EmailRecord emailRecord, String check){
         List<RecipientRecord> records =  new ArrayList<RecipientRecord>();
         for (String id : ids){

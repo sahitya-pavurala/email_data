@@ -8,14 +8,15 @@ import sp.email.analysis.utils.Constants;
 
 /**
  * Created by sahityapavurala on 2/23/17.
+ * Bean class for recipient record
  */
 public class RecipientRecord {
 
     private String message_id;
     private String recipient;
-    private int is_to;
-    private int is_cc;
-    private int is_bcc;
+    private int is_to;  //  to be used
+    private int is_cc;  //  while counting the receivers
+    private int is_bcc; //  and senders
 
     public String getMessage_id() {
         return message_id;
@@ -57,6 +58,11 @@ public class RecipientRecord {
         this.is_bcc = is_bcc;
     }
 
+    /**
+     * Override toString method to return the recipient record as
+     * String seperated by a delimiter
+     * @return
+     */
     public String toString(){
         StringBuilder sb = new StringBuilder();
 
@@ -67,6 +73,11 @@ public class RecipientRecord {
         return sb.append("\n").toString();
     }
 
+    /**
+     * Return the schema of the recipient record to construct
+     * dataframe of recipient records from csv
+     * @return
+     */
     public static StructType getSchema() {
         StructType customSchema = new StructType(new StructField[]{
                 new StructField("message_id", DataTypes.StringType, true, Metadata.empty()),

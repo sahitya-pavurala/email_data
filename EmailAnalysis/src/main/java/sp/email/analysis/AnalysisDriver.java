@@ -12,7 +12,7 @@ import sp.email.analysis.utils.FilePreprocessor;
 import java.io.IOException;
 import java.util.List;
 
-/**
+/** Driver class for the application
  * Created by sahityapavurala on 2/22/17.
  */
 public class AnalysisDriver {
