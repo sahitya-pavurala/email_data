@@ -77,7 +77,7 @@ public class FilePreprocessor {
                     }
                     else if (s.startsWith("Subject")) {
                         previousLine = "Subject";
-                        val = s.replace("Subject:","").trim().replaceAll(","," ").replaceAll("\\s", " ");
+                        val = s.replace("Subject:","").trim().replaceAll(","," ").replaceAll("\\s", " ").trim();
                         emailRecord.setSubject(val);
                         emailRecord.setHash(EmailUtils.getHash(val));
                     }
