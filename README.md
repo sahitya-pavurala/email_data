@@ -1,10 +1,16 @@
 # email_data
 Requirements:
+
 Maven 3.3.9
+
 Java 1.8
+
 Spark 1.6
+
 univocity-parsers-1.5.1.jar
+
 commons-csv-1.1.jar
+
 spark-csv_2.11-1.5.0.jar
 
 1) Open the EmailAnalysis directory and compile the code using "mvn clean install"
